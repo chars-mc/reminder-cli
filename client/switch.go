@@ -1,6 +1,7 @@
 package client
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -99,4 +100,44 @@ func (s Switch) Help() {
 		sb.WriteString("\t--help\n")
 	}
 	fmt.Printf("Usage of: %s:\n<command> [<args>]\n%s", os.Args[0], sb.String())
+}
+
+// reminderFlags sets the title, message and duration of a reminder on a FlagSet
+func (s Switch) reminderFlags(f *flag.FlagSet) (*string, *string, *time.Duration) {
+	t, m, d := "", "", time.Duration(0)
+	f.StringVar(&t, "title", "", "Reminder title")
+	f.StringVar(&t, "t", "", "Reminder title")
+	f.StringVar(&m, "message", "", "Reminder message")
+	f.StringVar(&m, "m", "", "Reminder message")
+	f.StringVar(&m, "duration", "", "Reminder time")
+	f.StringVar(&m, "d", "", "Reminder time")
+
+	return &t, &m, &d
+}
+
+// checkArgs checks if there are enough arguments on os.Args
+func (s Switch) checkArgs(minArgs int) error {
+	if len(os.Args) == 3 && os.Args[2] == "--help" {
+		return nil
+	}
+	if len(os.Args)-2 < minArgs {
+		fmt.Printf(
+			"incorrect use of %s\n%s %s --help",
+			os.Args[1], os.Args[0], os.Args[1],
+		)
+		return fmt.Errorf(
+			"%s expects at least %d arg(s), %d provided",
+			os.Args[1], minArgs, len(os.Args)-2,
+		)
+	}
+	return nil
+}
+
+// parseCmd parses the arguments from os.Args[2:]
+func (s Switch) parseCmd(cmd *flag.FlagSet) error {
+	err := cmd.Parse(os.Args[2:])
+	if err != nil {
+		return wrapError("could not parse '"+cmd.Name()+"' flags", err)
+	}
+	return nil
 }
