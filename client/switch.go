@@ -4,10 +4,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
-// BackendHTTPClient ...
+// BackendHTTPClient defines the methods of the http client
 type BackendHTTPClient interface {
+	Create(title, message string, duration time.Duration) ([]byte, error)
+	Edit(id, title, message string, duration time.Duration) ([]byte, error)
+	Fetch(ids []string) ([]byte, error)
+	Delete(ids []string) error
+	Healthy(host string) bool
 }
 
 // Switch contains the http clients, the backend url
