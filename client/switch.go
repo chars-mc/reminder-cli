@@ -55,7 +55,21 @@ func (s Switch) Switch() error {
 // create adds a new reminder
 func (s Switch) create() func(string) error {
 	return func(cmd string) error {
-		fmt.Println("create reminder")
+		createCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
+		t, m, d := s.reminderFlags(createCmd)
+
+		if err := s.checkArgs(3); err != nil {
+			return err
+		}
+		if err := s.parseCmd(createCmd); err != nil {
+			return err
+		}
+
+		res, err := s.client.Create(*t, *m, *d)
+		if err != nil {
+			return wrapError("could not create reminder", err)
+		}
+		fmt.Printf("Reminder created succesfully:\n%s", string(res))
 		return nil
 	}
 }
