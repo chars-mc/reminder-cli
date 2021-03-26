@@ -8,6 +8,20 @@ import (
 	"time"
 )
 
+// idsFlag contains the ids of the reminders
+type idsFlag []string
+
+// String return a string with all the reminder's id separated by ','
+func (list idsFlag) String() string {
+	return strings.Join(list, ",")
+}
+
+// Set adds an id to the list of ids
+func (list *idsFlag) Set(v string) error {
+	*list = append(*list, v)
+	return nil
+}
+
 // BackendHTTPClient defines the methods of the http client
 type BackendHTTPClient interface {
 	Create(title, message string, duration time.Duration) ([]byte, error)
