@@ -91,7 +91,24 @@ func (s Switch) create() func(string) error {
 // edit modify an existing reminder
 func (s Switch) edit() func(string) error {
 	return func(cmd string) error {
-		fmt.Println("edit reminder")
+		ids := idsFlag{}
+		editCmd := flag.NewFlagSet("edit", flag.ExitOnError)
+		editCmd.Var(&ids, "id", "The ID (int) of the reminder to edit")
+		t, m, d := s.reminderFlags(editCmd)
+
+		if err := s.checkArgs(2); err != nil {
+			return err
+		}
+		if err := s.parseCmd(editCmd); err != nil {
+			return err
+		}
+
+		lastID := ids[len(ids)-1]
+		res, err := s.client.Edit(lastID, *t, *m, *d)
+		if err != nil {
+			return wrapError("Could not edit reminder", err)
+		}
+		fmt.Printf("Reminder edited succesfully:\n%s", string(res))
 		return nil
 	}
 }
