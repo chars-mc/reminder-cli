@@ -139,7 +139,22 @@ func (s Switch) fetch() func(string) error {
 // delete deletes a reminder
 func (s Switch) delete() func(string) error {
 	return func(cmd string) error {
-		fmt.Println("delete reminder")
+		ids := idsFlag{}
+		deleteCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
+		deleteCmd.Var(&ids, "id", "List of reminder IDs (int) to delete")
+
+		if err := s.checkArgs(1); err != nil {
+			return err
+		}
+		if err := s.parseCmd(deleteCmd); err != nil {
+			return err
+		}
+
+		err := s.client.Delete(ids)
+		if err != nil {
+			return wrapError("could not delete reminder(s)", err)
+		}
+		fmt.Printf("succesfully deleted record(s):\n%v\n", ids)
 		return nil
 	}
 }
