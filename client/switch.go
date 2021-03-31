@@ -116,7 +116,22 @@ func (s Switch) edit() func(string) error {
 // fetch gets all the reminders
 func (s Switch) fetch() func(string) error {
 	return func(cmd string) error {
-		fmt.Println("fetch reminders")
+		ids := idsFlag{}
+		fetchCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
+		fetchCmd.Var(&ids, "id", "The ID (int) of the reminder to fetch")
+
+		if err := s.checkArgs(1); err != nil {
+			return err
+		}
+		if err := s.parseCmd(fetchCmd); err != nil {
+			return err
+		}
+
+		res, err := s.client.Fetch(ids)
+		if err != nil {
+			return wrapError("could not fetch reminder(s)", err)
+		}
+		fmt.Printf("reminders fetched succesfully:\n%s", string(res))
 		return nil
 	}
 }
