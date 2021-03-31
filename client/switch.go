@@ -92,7 +92,7 @@ func (s Switch) create() func(string) error {
 func (s Switch) edit() func(string) error {
 	return func(cmd string) error {
 		ids := idsFlag{}
-		editCmd := flag.NewFlagSet("edit", flag.ExitOnError)
+		editCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
 		editCmd.Var(&ids, "id", "The ID (int) of the reminder to edit")
 		t, m, d := s.reminderFlags(editCmd)
 
