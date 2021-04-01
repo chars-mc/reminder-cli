@@ -162,7 +162,17 @@ func (s Switch) delete() func(string) error {
 // health checks if the notifier server is running
 func (s Switch) health() func(string) error {
 	return func(cmd string) error {
-		fmt.Println("calling health")
+		var host string
+		healthCmd := flag.NewFlagSet(cmd, flag.ExitOnError)
+		healthCmd.StringVar(&host, "host", s.backendAPIURL, "Host to ping for health")
+		if err := s.parseCmd(healthCmd); err != nil {
+			return err
+		}
+		if !s.client.Healthy(host) {
+			fmt.Printf("host %s is down", host)
+		}
+		fmt.Printf("host %s is up and running", host)
+
 		return nil
 	}
 }
